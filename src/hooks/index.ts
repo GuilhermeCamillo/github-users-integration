@@ -4,5 +4,3 @@ export { useGitHubRepositoriesPaginated } from "./useGitHubRepositoriesPaginated
 export { useGitHubRepository } from "./useGitHubRepository";
 export { useUserSearch } from "./useUserSearch";
 export { useNetworkStatus } from "./useNetworkStatus";
-export { useOfflineDetection } from "./useOfflineDetection";
-

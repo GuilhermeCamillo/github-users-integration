@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchUserRepositories } from "../services/githubApi";
-import type { GitHubRepository, SortOption, SortDirection } from "../types/github";
+import type {
+  GitHubRepository,
+  SortOption,
+  SortDirection,
+} from "../types/github";
 
 interface UseGitHubRepositoriesParams {
   username: string;
@@ -22,4 +26,3 @@ export const useGitHubRepositories = ({
     },
   });
 };
-
