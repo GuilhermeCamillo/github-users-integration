@@ -56,14 +56,22 @@ src/
 - Retry inteligente: não retenta em erros 404
 - Cache versionado com sistema de buster
 
-### Serviços de API
+### Serviços de API (Axios)
+
+Todas as chamadas HTTP são realizadas através do Axios. O cliente HTTP está configurado em `services/githubApi.ts` com:
+
+- Base URL: `https://api.github.com`
+- Headers padrão: `Accept: application/vnd.github.v3+json`
+- Instância Axios reutilizável para todas as requisições
+
+Funções disponíveis:
 
 - `fetchGitHubUser(username)`: Busca informações do usuário
 - `fetchUserRepositories(username, sort, direction)`: Busca repositórios sem paginação
 - `fetchUserRepositoriesPaginated(username, sort, direction, page, perPage)`: Busca repositórios com paginação
 - `fetchRepository(owner, repo)`: Busca repositório específico
 - `validateGitHubUsername(username)`: Valida formato do username
-- Extração automática de paginação dos headers HTTP
+- Extração automática de paginação dos headers HTTP (Link header)
 
 ### Hooks Customizados
 
