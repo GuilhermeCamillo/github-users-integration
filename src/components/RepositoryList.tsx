@@ -1,8 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RepositoryCard } from "./RepositoryCard";
 import { SortFilter } from "./SortFilter";
 import { Pagination } from "./Pagination";
-import type { GitHubRepository, SortOption, SortDirection } from "../types/github";
+import type {
+  GitHubRepository,
+  SortOption,
+  SortDirection,
+} from "../types/github";
 import type { PaginationInfo } from "../types/github";
 
 interface RepositoryListProps {
@@ -26,9 +30,15 @@ export const RepositoryList = ({
 }: RepositoryListProps) => {
   const [sort, setSort] = useState<SortOption>(currentSort);
   const [direction, setDirection] = useState<SortDirection>(currentDirection);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (containerRef.current && pagination?.page !== 1) {
+      containerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
   }, [pagination?.page]);
 
   const handleSortChange = (newSort: SortOption) => {
@@ -50,7 +60,7 @@ export const RepositoryList = ({
   }
 
   return (
-    <div className="repository-list">
+    <div className="repository-list" ref={containerRef}>
       <SortFilter
         sort={sort}
         direction={direction}
@@ -68,4 +78,3 @@ export const RepositoryList = ({
     </div>
   );
 };
-
