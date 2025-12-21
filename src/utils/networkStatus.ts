@@ -5,4 +5,3 @@ export const isOnline = (): boolean => {
 export const isOffline = (): boolean => {
   return !isOnline();
 };
-

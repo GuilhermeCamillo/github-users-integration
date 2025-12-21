@@ -33,4 +33,3 @@ export const useUserSearch = ({
     error: userQuery.error || reposQuery.error,
   };
 };
-
