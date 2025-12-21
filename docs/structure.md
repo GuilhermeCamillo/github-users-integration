@@ -20,8 +20,6 @@ src/
 │   ├── useGitHubRepository.ts
 │   ├── useUserSearch.ts
 │   ├── useNetworkStatus.ts
-│   ├── useToast.ts
-│   ├── useOfflineDetection.ts
 │   └── index.ts
 ├── pages/
 │   ├── Search.tsx
@@ -30,14 +28,15 @@ src/
 ├── components/
 │   ├── SearchBar.tsx
 │   ├── UserCard.tsx
+│   ├── UserCardSkeleton.tsx
 │   ├── RepositoryCard.tsx
+│   ├── RepositoryCardSkeleton.tsx
 │   ├── RepositoryList.tsx
+│   ├── RepositoryListSkeleton.tsx
+│   ├── RepositoryDetailsSkeleton.tsx
 │   ├── SortFilter.tsx
 │   ├── Pagination.tsx
-│   ├── Toast.tsx
-│   └── ToastContainer.tsx
-├── contexts/
-│   └── ToastContext.tsx
+│   └── Skeleton.tsx
 ├── types/
 │   └── github.ts
 ├── utils/
@@ -81,10 +80,8 @@ Todos os hooks configurados com `meta.persist: true`:
 - `useGitHubRepositories({ username, sort, direction })`: Repositórios sem paginação
 - `useGitHubRepositoriesPaginated({ username, sort, direction, page, perPage })`: Repositórios com paginação
 - `useGitHubRepository(owner, repo)`: Repositório específico
-- `useUserSearch(username)`: Usuário e repositórios simultaneamente
-- `useNetworkStatus()`: Monitora status da conexão
-- `useToast()`: Gerencia toasts (usado internamente pelo ToastContext)
-- `useOfflineDetection({ toast, isFetching })`: Detecta perda de conexão durante buscas
+- `useUserSearch({ username, sort, direction, page, perPage })`: Usuário e repositórios simultaneamente
+- `useNetworkStatus()`: Monitora status da conexão (retorna `{ isOffline: boolean }`)
 
 ### Rotas
 
@@ -96,39 +93,35 @@ Todos os hooks configurados com `meta.persist: true`:
 
 - **SearchBar**: Barra de busca com validação
 - **UserCard**: Avatar, nome, bio, estatísticas e localização
+- **UserCardSkeleton**: Skeleton loader para UserCard
 - **RepositoryCard**: Nome, descrição, stats e link
+- **RepositoryCardSkeleton**: Skeleton loader para RepositoryCard
 - **RepositoryList**: Lista com ordenação e paginação
+- **RepositoryListSkeleton**: Skeleton loader para RepositoryList
+- **RepositoryDetailsSkeleton**: Skeleton loader para página de detalhes
 - **SortFilter**: Ordenação por estrelas ou nome (crescente/decrescente)
 - **Pagination**: Navegação e números de página
-- **Toast**: Notificação individual (success, error, warning, info)
-- **ToastContainer**: Gerencia múltiplos toasts simultaneamente
+- **Skeleton**: Componente base para skeleton loaders
 
 ### UI/UX
 
 - Paginação: 12 repositórios por página (configurável)
 - Ordenação: Por estrelas ou nome (crescente/decrescente)
-- Estados de loading: Spinners durante carregamento
+- Estados de loading: Skeleton loaders durante carregamento
 - Tratamento de erros: Mensagens amigáveis
-- Notificação offline: Banner fixo no header quando offline
-- Sistema de Toast: Notificações não intrusivas
-  - Aviso quando conexão é perdida
-  - Sucesso quando conexão é restaurada
-  - Específico quando conexão é perdida durante busca
+- Notificação offline: Banner fixo no topo quando offline
 - Scroll automático: Volta ao topo ao mudar de página
 - Design responsivo: Mobile e desktop
 - Modo escuro fixo: Cores escuras por padrão
 
 ### Detecção de Conexão
 
-- `useNetworkStatus()`: Monitora mudanças na conexão
-- Utilitários para detectar status online/offline
-- Banner fixo no header quando offline
-- `ToastContext`: Gerencia toasts globalmente
-- `useToastContext()`: Acessa funções de toast
-- `useOfflineDetection()`: Detecta perda de conexão durante buscas
-- Notificações automáticas quando conexão é perdida ou restaurada
+- `useNetworkStatus()`: Monitora mudanças na conexão (retorna `{ isOffline: boolean }`)
+- Utilitários para detectar status online/offline em `utils/networkStatus.ts`
+- Banner fixo no topo quando offline (exibido em `App.tsx`)
 - Dados em cache disponíveis offline
 - Priorização de cache quando offline
+- Tratamento de estado offline sem cache na página de resultados
 
 ## Exemplos de Uso
 
@@ -189,25 +182,14 @@ const RepositoriesList = ({ username }: { username: string }) => {
 
 ```tsx
 import { useNetworkStatus } from "./hooks";
-import { useToastContext } from "./contexts/ToastContext";
-import { useEffect } from "react";
 
 const App = () => {
   const { isOffline } = useNetworkStatus();
-  const toast = useToastContext();
-
-  useEffect(() => {
-    if (isOffline) {
-      toast.showWarning("Você está offline. Dados em cache estão disponíveis.");
-    } else {
-      toast.showSuccess("Conexão restaurada!");
-    }
-  }, [isOffline, toast]);
 
   return (
     <div>
       {isOffline && (
-        <div role="alert" className="offline-notification">
+        <div role="alert" className="offline-banner">
           ⚠️ Você está offline. Dados em cache estão disponíveis.
         </div>
       )}
@@ -216,17 +198,23 @@ const App = () => {
 };
 ```
 
-### Detectar perda de conexão durante busca
+### Usar skeleton loaders
 
 ```tsx
-import { useOfflineDetection } from "./hooks/useOfflineDetection";
-import { useToastContext } from "./contexts/ToastContext";
+import { UserCardSkeleton } from "./components/UserCardSkeleton";
+import { RepositoryListSkeleton } from "./components/RepositoryListSkeleton";
 
 const ResultsPage = () => {
-  const toast = useToastContext();
-  const { isFetching } = useGitHubRepositoriesPaginated({ username });
+  const { isLoading } = useUserSearch({ username });
 
-  useOfflineDetection({ toast, isFetching });
+  if (isLoading) {
+    return (
+      <div>
+        <UserCardSkeleton />
+        <RepositoryListSkeleton />
+      </div>
+    );
+  }
 
   return <div>{/* Conteúdo */}</div>;
 };
@@ -236,7 +224,7 @@ const ResultsPage = () => {
 
 - Cache em memória: 5 minutos de staleTime
 - Persistência no localStorage: 24 horas
-- Chave de cache: `GITHUB_USERS_CACHE`
+- Chave de cache: `GITHUB_USERS_CACHE_v1` (com versão)
 - Versão do cache: `v1` (incrementável para invalidar cache antigo)
 - Modo offline-first: Usa cache mesmo sem conexão
 
@@ -257,12 +245,12 @@ const ResultsPage = () => {
 2. ✅ Páginas (busca, resultados, detalhes)
 3. ✅ Roteamento com React Router
 4. ✅ Componentes de UI
-5. ✅ Estilização com Sass (modo escuro fixo)
-6. ✅ Paginação de repositórios
-7. ✅ Ordenação e filtros
-8. ✅ Sistema de Toast para notificações
-9. ✅ Notificação offline no topo
-10. ✅ Detecção de perda de conexão durante busca
+5. ✅ Componentes Skeleton para loading states
+6. ✅ Estilização com Sass (modo escuro fixo)
+7. ✅ Paginação de repositórios
+8. ✅ Ordenação e filtros
+9. ✅ Notificação offline no topo (banner)
+10. ✅ Detecção de status de conexão
 11. ⏳ Testes unitários (React Testing Library)
 12. ⏳ Testes E2E (Cypress)
 13. ⏳ Deploy na AWS

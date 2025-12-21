@@ -15,7 +15,6 @@ cypress/
 │   ├── results.cy.ts
 │   ├── repository.cy.ts
 │   ├── offline.cy.ts
-│   ├── toast.cy.ts
 │   └── offline-notification.cy.ts
 ├── fixtures/
 │   └── github-api.json
@@ -58,24 +57,12 @@ cypress/
 
 - Dados em cache exibidos quando offline
 - Notificação offline no topo aparece quando conexão é perdida
-- Toast de aviso aparece quando conexão é perdida
-- Toast de sucesso aparece quando conexão é restaurada
-- Toast específico aparece quando conexão é perdida durante busca
 - Busca funciona com dados em cache
 - Navegação funciona offline
 - Dados em cache priorizados quando offline
+- Estado de erro quando offline e sem cache
 
-### 5. Sistema de Toast (`toast.cy.ts`)
-
-- Toast aparece quando conexão é perdida
-- Toast aparece quando conexão é restaurada
-- Toast aparece quando conexão é perdida durante busca
-- Toast desaparece automaticamente após duração configurada
-- Toast pode ser fechado manualmente
-- Múltiplos toasts podem aparecer simultaneamente
-- Toast tem estilos corretos para cada tipo (success, error, warning, info)
-
-### 6. Notificação Offline (`offline-notification.cy.ts`)
+### 5. Notificação Offline (`offline-notification.cy.ts`)
 
 - Banner offline aparece no topo quando conexão é perdida
 - Banner offline desaparece quando conexão é restaurada
