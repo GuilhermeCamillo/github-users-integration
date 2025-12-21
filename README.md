@@ -30,6 +30,37 @@ Aplicação React para busca e visualização de usuários e repositórios do Gi
 npm install
 ```
 
+## Configuração
+
+### GitHub Personal Access Token
+
+Para evitar problemas com rate limit da API do GitHub, é recomendado configurar um token de acesso pessoal. O token aumenta o limite de requisições de 60 para 5000 por hora.
+
+#### Como criar um token:
+
+1. Acesse: https://github.com/settings/tokens
+2. Clique em **"Generate new token"** > **"Generate new token (classic)"**
+3. Dê um nome descritivo (ex: "github-users-integration")
+4. Selecione o escopo **"public_repo"** (ou **"repo"** se precisar acessar repositórios privados)
+5. Clique em **"Generate token"**
+6. Copie o token gerado
+
+#### Configurar o token:
+
+1. Copie o arquivo `.env.example` para `.env`:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Abra o arquivo `.env` e adicione seu token:
+
+   ```env
+   VITE_GITHUB_TOKEN=seu_token_do_github_aqui
+   ```
+
+3. Reinicie o servidor de desenvolvimento se estiver rodando
+
 ## Desenvolvimento
 
 ```bash

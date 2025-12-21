@@ -10,11 +10,13 @@ import type {
 } from "../types/github";
 
 const BASE_URL = "https://api.github.com";
+const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN || "";
 
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     Accept: "application/vnd.github.v3+json",
+    ...(GITHUB_TOKEN && { Authorization: `token ${GITHUB_TOKEN}` }),
   },
 });
 
@@ -43,11 +45,6 @@ const extractPaginationFromHeaders = (
   const perPageMatch = linkHeader.match(/[?&]per_page=(\d+)/);
   if (perPageMatch) {
     pagination.perPage = parseInt(perPageMatch[1], 10);
-  }
-
-  const pageMatch = linkHeader.match(/[?&]page=(\d+)/);
-  if (pageMatch) {
-    pagination.page = parseInt(pageMatch[1], 10);
   }
 
   if (pagination.totalPages && pagination.perPage) {
@@ -101,19 +98,48 @@ export const fetchUserRepositoriesPaginated = async (
     }
   );
 
-  const pagination = extractPaginationFromHeaders(response.headers) || {
+  const extractedPagination = extractPaginationFromHeaders(response.headers);
+  const linkHeader = response.headers.link;
+
+  let calculatedTotalPages = extractedPagination?.totalPages;
+
+  if (!calculatedTotalPages && linkHeader) {
+    const hasNext = linkHeader.includes('rel="next"');
+    const hasLast = linkHeader.includes('rel="last"');
+
+    if (hasLast) {
+      const lastMatch = linkHeader.match(
+        /<[^>]*[?&]page=(\d+)[^>]*>;\s*rel="last"/
+      );
+      if (lastMatch) {
+        calculatedTotalPages = parseInt(lastMatch[1], 10);
+      }
+    } else if (!hasNext) {
+      calculatedTotalPages = page;
+    } else {
+      calculatedTotalPages = page + 1;
+    }
+  } else if (!calculatedTotalPages) {
+    if (response.data.length < perPage) {
+      calculatedTotalPages = page;
+    } else {
+      calculatedTotalPages = Math.max(page, 1);
+    }
+  }
+
+  const finalTotalPages = Math.max(calculatedTotalPages || page, page);
+
+  const pagination: PaginationInfo = {
     page,
-    perPage,
-    total: response.data.length,
-    totalPages: 1,
+    perPage: extractedPagination?.perPage || perPage,
+    total: extractedPagination?.total || finalTotalPages * perPage,
+    totalPages: finalTotalPages,
     hasNext: false,
     hasPrev: false,
   };
 
-  if (pagination.totalPages) {
-    pagination.hasNext = page < pagination.totalPages;
-    pagination.hasPrev = page > 1;
-  }
+  pagination.hasNext = page < pagination.totalPages;
+  pagination.hasPrev = page > 1;
 
   return {
     data: response.data,
