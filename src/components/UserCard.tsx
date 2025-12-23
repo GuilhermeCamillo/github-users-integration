@@ -6,7 +6,7 @@ interface UserCardProps {
 
 export const UserCard = ({ user }: UserCardProps) => {
   return (
-    <div className="user-card">
+    <div className="user-card" data-testid="user-card">
       <div className="user-card__header">
         <img
           src={user.avatar_url}
