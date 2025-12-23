@@ -87,9 +87,11 @@ npm run preview
 
 Consulte [docs/structure.md](./docs/structure.md) para detalhes sobre a arquitetura e estrutura do projeto.
 
+Para a visão de arquitetura na AWS (S3 + CloudFront + Route 53) e fluxo de deploy da aplicação, consulte [docs/architecture-aws.md](./docs/architecture-aws.md).
+
 ## Testes
 
-#### Modo Interativo (Recomendado para desenvolvimento)
+#### Modo Interativo (Desenvolvimento)
 
 1. **Inicie o servidor de desenvolvimento em um terminal:**
 
