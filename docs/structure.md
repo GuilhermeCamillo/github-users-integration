@@ -252,5 +252,5 @@ const ResultsPage = () => {
 9. ✅ Notificação offline no topo (banner)
 10. ✅ Detecção de status de conexão
 11. ⏳ Testes unitários (React Testing Library)
-12. ⏳ Testes E2E (Cypress)
-13. ⏳ Deploy na AWS
+12. ✅ Testes E2E (Cypress)
+13. ✅ Deploy em VPS com Coolify

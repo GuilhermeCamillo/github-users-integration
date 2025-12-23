@@ -21,6 +21,7 @@ export const SortFilter = ({
           value={sort}
           onChange={(e) => onSortChange(e.target.value as SortOption)}
           className="sort-filter__select"
+          data-testid="sort-select"
         >
           <option value="stars">Estrelas</option>
           <option value="name">Nome</option>
@@ -34,6 +35,7 @@ export const SortFilter = ({
           value={direction}
           onChange={(e) => onDirectionChange(e.target.value as SortDirection)}
           className="sort-filter__select"
+          data-testid="direction-select"
         >
           <option value="desc">Decrescente</option>
           <option value="asc">Crescente</option>

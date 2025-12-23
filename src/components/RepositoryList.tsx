@@ -60,7 +60,7 @@ export const RepositoryList = ({
   }
 
   return (
-    <div className="repository-list" ref={containerRef}>
+    <div className="repository-list" ref={containerRef} data-testid="repository-list">
       <SortFilter
         sort={sort}
         direction={direction}

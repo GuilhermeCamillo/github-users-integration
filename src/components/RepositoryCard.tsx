@@ -8,11 +8,12 @@ interface RepositoryCardProps {
 
 export const RepositoryCard = ({ repository, owner }: RepositoryCardProps) => {
   return (
-    <div className="repository-card">
+    <div className="repository-card" data-testid="repository-card">
       <div className="repository-card__header">
         <Link
           to={`/user/${owner}/repo/${repository.name}`}
           className="repository-card__title"
+          data-testid="repository-link"
         >
           {repository.name}
         </Link>
