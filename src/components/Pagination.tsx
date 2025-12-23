@@ -24,7 +24,7 @@ export const Pagination = ({ pagination, onPageChange }: PaginationProps) => {
   }
 
   return (
-    <div className="pagination">
+    <div className="pagination" data-testid="pagination">
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={!hasPrev}

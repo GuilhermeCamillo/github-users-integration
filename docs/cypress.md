@@ -17,7 +17,9 @@ cypress/
 │   ├── offline.cy.ts
 │   └── offline-notification.cy.ts
 ├── fixtures/
-│   └── github-api.json
+│   ├── github-user.json
+│   ├── github-repos.json
+│   └── github-repository.json
 └── support/
     ├── commands.ts
     └── e2e.ts
@@ -80,14 +82,22 @@ Cypress.Commands.add("searchUser", (username: string) => {
 
 Cypress.Commands.add("goOffline", () => {
   cy.window().then((win) => {
-    cy.stub(win.navigator, "onLine").value(false);
+    Object.defineProperty(win.navigator, "onLine", {
+      writable: true,
+      configurable: true,
+      value: false,
+    });
     win.dispatchEvent(new Event("offline"));
   });
 });
 
 Cypress.Commands.add("goOnline", () => {
   cy.window().then((win) => {
-    cy.stub(win.navigator, "onLine").value(true);
+    Object.defineProperty(win.navigator, "onLine", {
+      writable: true,
+      configurable: true,
+      value: true,
+    });
     win.dispatchEvent(new Event("online"));
   });
 });
@@ -95,17 +105,28 @@ Cypress.Commands.add("goOnline", () => {
 
 ## Mock da API
 
+Os testes usam fixtures para mockar as respostas da API do GitHub:
+
 ```typescript
 beforeEach(() => {
-  cy.intercept("GET", "**/api.github.com/users/*", {
+  cy.intercept("GET", "**/api.github.com/users/octocat", {
     fixture: "github-user.json",
   }).as("getUser");
 
-  cy.intercept("GET", "**/api.github.com/users/*/repos*", {
+  cy.intercept("GET", "**/api.github.com/users/octocat/repos*", {
     fixture: "github-repos.json",
+    headers: {
+      link: '<https://api.github.com/users/octocat/repos?page=1&per_page=12>; rel="first", <https://api.github.com/users/octocat/repos?page=1&per_page=12>; rel="last"',
+    },
   }).as("getRepos");
 });
 ```
+
+### Fixtures Disponíveis
+
+- `github-user.json` - Dados de um usuário do GitHub
+- `github-repos.json` - Lista de repositórios de um usuário
+- `github-repository.json` - Dados de um repositório específico
 
 ## Exemplo de Teste
 
@@ -129,39 +150,75 @@ describe("Página de Busca", () => {
     cy.get('[data-testid="search-input"]').type("invalid-user-12345");
     cy.get('[data-testid="search-button"]').click();
     cy.wait("@getUserError");
-    cy.contains("Erro ao buscar usuário").should("be.visible");
+    cy.contains("Usuário não encontrado").should("be.visible");
   });
 });
 ```
 
 ## Data Test IDs
 
-Adicione `data-testid` aos elementos importantes:
+Os componentes já possuem `data-testid` para facilitar os testes:
 
-```tsx
-<input
-  data-testid="search-input"
-  type="text"
-/>
-
-<button data-testid="search-button">
-  Buscar
-</button>
-```
+- `search-input` - Campo de busca
+- `search-button` - Botão de busca
+- `user-card` - Card do usuário
+- `repository-card` - Card de repositório
+- `repository-link` - Link para detalhes do repositório
+- `repository-list` - Lista de repositórios
+- `pagination` - Componente de paginação
+- `sort-select` - Select de ordenação
+- `direction-select` - Select de direção (asc/desc)
+- `offline-banner` - Banner de notificação offline
 
 ## Executar Testes
 
+### Modo Interativo
+
 ```bash
 npm run cypress:open
+```
+
+Abre o Cypress Test Runner onde você pode selecionar e executar testes individualmente.
+
+### Modo Headless (CI/CD)
+
+```bash
 npm run cypress:run
 ```
 
-## Próximos Passos
+Executa todos os testes em modo headless, ideal para CI/CD.
 
-1. Instalar Cypress e dependências
-2. Configurar estrutura de pastas
-3. Criar comandos customizados
-4. Implementar mocks da API
-5. Escrever testes para cada cenário
-6. Adicionar data-testid aos componentes
-7. Configurar CI/CD para executar testes automaticamente
+### Alias
+
+```bash
+npm run test:e2e
+```
+
+Alias para `cypress:run`.
+
+## Configuração
+
+O Cypress está configurado para não salvar vídeos nem screenshots:
+
+```javascript
+// cypress.config.mjs
+export default defineConfig({
+  e2e: {
+    video: false,
+    screenshotOnRunFailure: false,
+    // ...
+  },
+});
+```
+
+A pasta `cypress/downloads` está no `.gitignore` para evitar commits de arquivos de download.
+
+## Status dos Testes
+
+✅ Todos os testes E2E foram implementados:
+
+- ✅ Página de busca
+- ✅ Página de resultados
+- ✅ Página de detalhes do repositório
+- ✅ Funcionalidade offline
+- ✅ Notificação offline

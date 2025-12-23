@@ -89,4 +89,45 @@ Consulte [docs/structure.md](./docs/structure.md) para detalhes sobre a arquitet
 
 ## Testes
 
-Consulte [docs/cypress.md](./docs/cypress.md) para informações sobre testes E2E.
+#### Modo Interativo (Recomendado para desenvolvimento)
+
+1. **Inicie o servidor de desenvolvimento em um terminal:**
+
+   ```bash
+   npm run dev
+   ```
+
+2. **Em outro terminal, abra o Cypress:**
+
+   ```bash
+   npm run cypress:open
+   ```
+
+3. **No Cypress Test Runner:**
+   - Selecione **"E2E Testing"**
+   - Escolha um navegador (Chrome, Edge, Firefox, etc.)
+   - Clique em **"Start E2E Testing"**
+   - Selecione o arquivo de teste que deseja executar na lista
+
+#### Modo Headless (Para CI/CD)
+
+Execute todos os testes em modo headless (sem interface gráfica):
+
+```bash
+npm run cypress:run
+```
+
+Ou use o alias:
+
+```bash
+npm run test:e2e
+```
+
+### Dicas
+
+1. **Servidor de Desenvolvimento**: Sempre inicie o servidor (`npm run dev`) antes de executar os testes
+2. **Base URL**: Os testes estão configurados para `http://localhost:5173` (porta padrão do Vite)
+3. **Mocks**: Os testes usam fixtures para mockar as respostas da API do GitHub, evitando chamadas reais
+4. **Data Test IDs**: Os componentes usam `data-testid` para facilitar a seleção nos testes
+
+Para mais detalhes, consulte [docs/cypress.md](./docs/cypress.md).

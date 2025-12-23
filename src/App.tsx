@@ -12,7 +12,7 @@ const AppContent = () => {
   return (
     <>
       {isOffline && (
-        <div className="offline-banner" role="alert">
+        <div className="offline-banner" role="alert" data-testid="offline-banner">
           ⚠️ Você está offline. Dados em cache estão disponíveis.
         </div>
       )}
