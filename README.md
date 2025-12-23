@@ -2,6 +2,10 @@
 
 Aplicação React para busca e visualização de usuários e repositórios do GitHub, com suporte offline completo através do React Query e persistência no localStorage.
 
+## Demo
+
+Você pode acessar a aplicação em produção em: [github-users.guilhermecamillo.com](https://github-users.guilhermecamillo.com/).
+
 ## Funcionalidades
 
 - Busca de usuários do GitHub
